@@ -3,7 +3,7 @@ def centos = docker.image('essdmscdm/centos-build-node:0.2.5')
 def container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 
 def conan_user = "ess-dmsc"
-def conan_package_channel = "testing"
+def conan_pkg_channel = "testing"
 
 node('docker') {
     def run_args = "\
@@ -51,7 +51,7 @@ node('docker') {
         stage('Package') {
             def package_script = """
                 cd ${project}
-                conan create ${conan_user}/${conan_package_channel}
+                conan create ${conan_user}/${conan_pkg_channel}
             """
             sh "docker exec ${container_name} sh -c \"${package_script}\""
         }
@@ -61,10 +61,15 @@ node('docker') {
                 export http_proxy=''
                 https_proxy=''
                 cd ${project}
+                # Get package version from conanfile.py
+                VERSION=$(\
+                    grep "version = " conanfile.py \
+                    | awk '{print $3}' \
+                    | sed -e 's/\"//g')
                 conan upload \
                     --all \
                     --remote ess-dmsc-local \
-                    'FlatBuffers/*'
+                    'FlatBuffers/$VERSION@${conan_user}/${conan_pkg_channel}'
             """
             sh "docker exec ${container_name} sh -c \"${package_script}\""
         }
