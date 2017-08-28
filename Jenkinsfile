@@ -57,20 +57,12 @@ node('docker') {
         }
 
         stage('Upload') {
-            // Get package version from conanfile.py
-            def version = sh(
-                returnStdout: true,
-                script: """
-                    cd ${project}
-                    grep "version = " conanfile.py \
-                    | awk '{print \$3}' \
-                    | sed -e 's/\\"//g'
-                """
-            )
             def package_script = """
                 export http_proxy=''
                 export https_proxy=''
                 cd ${project}
+                version=`./get_package_version`
+                echo $version
                 conan upload \
                     --all \
                     --remote ess-dmsc-local \
