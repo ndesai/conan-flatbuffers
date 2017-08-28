@@ -62,7 +62,6 @@ node('docker') {
                 export https_proxy=''
                 cd ${project}
                 version=`./get_package_version`
-                echo $version
                 conan upload \
                     --all \
                     --remote ess-dmsc-local \
