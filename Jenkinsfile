@@ -30,10 +30,11 @@ node('docker') {
                     ])
             {
                 def setup_script = """
+                    set +x
                     export http_proxy=''
                     export https_proxy=''
                     conan remote add --insert 0 ess-dmsc-local http://192.168.12.24:9300
-                    conan user --password ${CONAN_PASSWORD} --remote ess-dmsc-local ${CONAN_USERNAME}
+                    conan user --password '${CONAN_PASSWORD}' --remote ess-dmsc-local '${CONAN_USERNAME}'
                 """
                 sh "docker exec ${container_name} sh -c \"${setup_script}\""
             }
