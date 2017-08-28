@@ -8,9 +8,7 @@ node('docker') {
        --tty \
        --network=host \
        --env http_proxy=${env.http_proxy} \
-       --env https_proxy=${env.https_proxy} \
-       --mount type=bind,readonly=true,src=/home/jenkins/.conan/cacert.pem,dst=/conan/.conan/cacert.pem \
-       --mount type=bind,readonly=true,src=/home/jenkins/.conan/.conan.db,dst=/conan/.conan/.conan.db"
+       --env https_proxy=${env.https_proxy}"
 
    try {
         container = centos.run(run_args)
@@ -24,8 +22,10 @@ node('docker') {
         }
 
         stage('Package') {
-            // Copy Conan registry containing ess-dmsc-local Conan server.
+            // Copy Conan registry and local server credentials.
             sh "docker cp /home/jenkins/.conan/registry.txt ${container_name}:/conan/.conan/registry.txt"
+            sh "docker cp /home/jenkins/.conan/cacert.pem ${container_name}:/conan/.conan/cacert.pem"
+            sh "docker cp /home/jenkins/.conan/.conan.db ${container_name}:/conan/.conan/.conan.db"
             def package_script = """
                 cd ${project}
                 conan create ess-dmsc/testing
