@@ -21,11 +21,25 @@ node('docker') {
             sh "docker exec ${container_name} sh -c \"${checkout_script}\""
         }
 
+        stage('Conan setup') {
+            withCredentials(
+                    [usernamePassword(
+                        credentialsId: 'conan-server-local',
+                        passwordVariable: 'CONAN_PASSWORD',
+                        usernameVariable: 'CONAN_USERNAME')
+                    ])
+            {
+                def setup_script = """
+                    export http_proxy=''
+                    export https_proxy=''
+                    conan remote add --insert 0 ess-dmsc-local http://192.168.12.24:9300
+                    conan user --password ${CONAN_PASSWORD} --remote ess-dmsc-local ${CONAN_USERNAME}
+                """
+                sh "docker exec ${container_name} sh -c \"${setup_script}\""
+            }
+        }
+
         stage('Package') {
-            // Copy Conan registry and local server credentials.
-            sh "docker cp /home/jenkins/.conan/registry.txt ${container_name}:/conan/.conan/registry.txt"
-            sh "docker cp /home/jenkins/.conan/cacert.pem ${container_name}:/conan/.conan/cacert.pem"
-            sh "docker cp /home/jenkins/.conan/.conan.db ${container_name}:/conan/.conan/.conan.db"
             def package_script = """
                 cd ${project}
                 conan create ess-dmsc/testing
