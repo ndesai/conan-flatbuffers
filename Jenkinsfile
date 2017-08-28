@@ -60,11 +60,12 @@ node('docker') {
             // Get package version from conanfile.py
             def version = sh(
                 returnStdout: true,
-                script: '''\
+                script: """
+                    cd ${project}
                     grep "version = " conanfile.py \
-                    | awk '{print $3}' \
-                    | sed -e 's/\"//g'
-                '''
+                    | awk '{print \$3}' \
+                    | sed -e 's/\\"//g'
+                """
             )
             def package_script = """
                 export http_proxy=''
