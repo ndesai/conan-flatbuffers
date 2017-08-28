@@ -62,7 +62,7 @@ node('docker') {
                 https_proxy=''
                 cd ${project}
                 # Get package version from conanfile.py
-                VERSION=$(\
+                VERSION=\$(\
                     grep "version = " conanfile.py \
                     | awk '{print \$3}' \
                     | sed -e 's/\"//g')
