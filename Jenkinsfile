@@ -64,7 +64,7 @@ node('docker') {
                 # Get package version from conanfile.py
                 VERSION=$(\
                     grep "version = " conanfile.py \
-                    | awk '{print $3}' \
+                    | awk '{print \$3}' \
                     | sed -e 's/\"//g')
                 conan upload \
                     --all \
