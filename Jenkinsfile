@@ -8,7 +8,8 @@ node('docker') {
        --tty \
        --network=host \
        --env http_proxy=${env.http_proxy} \
-       --env https_proxy=${env.https_proxy}"
+       --env https_proxy=${env.https_proxy} \
+       --env local_conan_server=${env.local_conan_server}"
 
    try {
         container = centos.run(run_args)
@@ -33,8 +34,13 @@ node('docker') {
                     set +x
                     export http_proxy=''
                     export https_proxy=''
-                    conan remote add --insert 0 ess-dmsc-local http://192.168.12.24:9300
-                    conan user --password '${CONAN_PASSWORD}' --remote ess-dmsc-local '${CONAN_USERNAME}'
+                    conan remote add \
+                        --insert 0 \
+                        ess-dmsc-local ${local_conan_server}
+                    conan user \
+                        --password '${CONAN_PASSWORD}' \
+                        --remote ess-dmsc-local \
+                        '${CONAN_USERNAME}'
                 """
                 sh "docker exec ${container_name} sh -c \"${setup_script}\""
             }
@@ -44,7 +50,19 @@ node('docker') {
             def package_script = """
                 cd ${project}
                 conan create ess-dmsc/testing
-                http_proxy="" https_proxy="" conan upload --remote ess-dmsc-local FlatBuffers/1.5.0@ess-dmsc/testing --all
+            """
+            sh "docker exec ${container_name} sh -c \"${package_script}\""
+        }
+
+        stage('Upload') {
+            def package_script = """
+                export http_proxy=''
+                https_proxy=''
+                cd ${project}
+                conan upload \
+                    --all \
+                    --remote ess-dmsc-local \
+                    FlatBuffers/1.5.0@ess-dmsc/testing
             """
             sh "docker exec ${container_name} sh -c \"${package_script}\""
         }
