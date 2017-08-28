@@ -2,6 +2,9 @@ def project = "conan-flatbuffers"
 def centos = docker.image('essdmscdm/centos-build-node:0.2.5')
 def container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 
+def conan_user = "ess-dmsc"
+def conan_package_channel = "testing"
+
 node('docker') {
     def run_args = "\
        --name ${container_name} \
@@ -23,12 +26,12 @@ node('docker') {
         }
 
         stage('Conan setup') {
-            withCredentials(
-                    [usernamePassword(
-                        credentialsId: 'conan-server-local',
-                        passwordVariable: 'CONAN_PASSWORD',
-                        usernameVariable: 'CONAN_USERNAME')
-                    ])
+                withCredentials(
+                        [usernamePassword(
+                            credentialsId: 'conan-server-local',
+                            passwordVariable: 'CONAN_PASSWORD'
+                        )]
+                )
             {
                 def setup_script = """
                     set +x
@@ -40,7 +43,7 @@ node('docker') {
                     conan user \
                         --password '${CONAN_PASSWORD}' \
                         --remote ess-dmsc-local \
-                        '${CONAN_USERNAME}' \
+                        ${conan_user} \
                         > /dev/null
                 """
                 sh "docker exec ${container_name} sh -c \"${setup_script}\""
@@ -50,7 +53,7 @@ node('docker') {
         stage('Package') {
             def package_script = """
                 cd ${project}
-                conan create ess-dmsc/testing
+                conan create ${conan_user}/${conan_package_channel}
             """
             sh "docker exec ${container_name} sh -c \"${package_script}\""
         }
@@ -63,7 +66,7 @@ node('docker') {
                 conan upload \
                     --all \
                     --remote ess-dmsc-local \
-                    FlatBuffers/1.5.0@ess-dmsc/testing
+                    'FlatBuffers/*@${conan_user}/${conan_package_channel}'
             """
             sh "docker exec ${container_name} sh -c \"${package_script}\""
         }
