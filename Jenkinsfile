@@ -26,12 +26,10 @@ node('docker') {
         }
 
         stage('Conan setup') {
-                withCredentials(
-                        [usernamePassword(
-                            credentialsId: 'conan-server-local',
-                            passwordVariable: 'CONAN_PASSWORD'
-                        )]
-                )
+                withCredentials([string(
+                    credentialsId: 'local-conan-server-password',
+                    variable: 'CONAN_PASSWORD'
+                )])
             {
                 def setup_script = """
                     set +x
