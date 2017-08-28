@@ -40,7 +40,8 @@ node('docker') {
                     conan user \
                         --password '${CONAN_PASSWORD}' \
                         --remote ess-dmsc-local \
-                        '${CONAN_USERNAME}'
+                        '${CONAN_USERNAME} \
+                        > /dev/null'
                 """
                 sh "docker exec ${container_name} sh -c \"${setup_script}\""
             }
