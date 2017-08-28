@@ -64,7 +64,7 @@ node('docker') {
                 conan upload \
                     --all \
                     --remote ess-dmsc-local \
-                    'FlatBuffers/*@${conan_user}/${conan_package_channel}'
+                    'FlatBuffers/*'
             """
             sh "docker exec ${container_name} sh -c \"${package_script}\""
         }
