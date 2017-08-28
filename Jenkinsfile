@@ -2,6 +2,7 @@ def project = "conan-flatbuffers"
 def centos = docker.image('essdmscdm/centos-build-node:0.2.5')
 def container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 
+def conan_remote = "ess-dmsc-local"
 def conan_user = "ess-dmsc"
 def conan_pkg_channel = "testing"
 
@@ -37,10 +38,10 @@ node('docker') {
                     export https_proxy=''
                     conan remote add \
                         --insert 0 \
-                        ess-dmsc-local ${local_conan_server}
+                        ${conan_remote} ${local_conan_server}
                     conan user \
                         --password '${CONAN_PASSWORD}' \
-                        --remote ess-dmsc-local \
+                        --remote ${conan_remote} \
                         ${conan_user} \
                         > /dev/null
                 """
@@ -57,17 +58,16 @@ node('docker') {
         }
 
         stage('Upload') {
-            def package_script = """
+            def upload_script = """
                 export http_proxy=''
                 export https_proxy=''
                 cd ${project}
-                version=`./get_package_version`
-                conan upload \
-                    --all \
-                    --remote ess-dmsc-local \
-                    'FlatBuffers/${version}@${conan_user}/${conan_pkg_channel}'
+                ./upload_package.py \
+                    ${conan_remote} \
+                    ${conan_user} \
+                    ${conan_pkg_channel}
             """
-            sh "docker exec ${container_name} sh -c \"${package_script}\""
+            sh "docker exec ${container_name} sh -c \"${upload_script}\""
         }
     } finally {
         container.stop()
