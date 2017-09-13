@@ -19,11 +19,10 @@ node('docker') {
         container = centos.run(run_args)
 
         stage('Checkout') {
-            def checkout_script = """
+            sh """docker exec ${container_name} sh -c \"
                 git clone https://github.com/ess-dmsc/${project}.git \
                     --branch ${env.BRANCH_NAME}
-            """
-            sh "docker exec ${container_name} sh -c \"${checkout_script}\""
+            \""""
         }
 
         stage('Conan setup') {
@@ -32,7 +31,7 @@ node('docker') {
                     variable: 'CONAN_PASSWORD'
                 )])
             {
-                def setup_script = """
+                sh """docker exec ${container_name} sh -c \"
                     set +x
                     export http_proxy=''
                     export https_proxy=''
@@ -44,21 +43,19 @@ node('docker') {
                         --remote ${conan_remote} \
                         ${conan_user} \
                         > /dev/null
-                """
-                sh "docker exec ${container_name} sh -c \"${setup_script}\""
+                \""""
             }
         }
 
         stage('Package') {
-            def package_script = """
+            sh """docker exec ${container_name} sh -c \"
                 cd ${project}
                 conan create ${conan_user}/${conan_pkg_channel}
-            """
-            sh "docker exec ${container_name} sh -c \"${package_script}\""
+            \""""
         }
 
         stage('Upload') {
-            def upload_script = """
+            sh """docker exec ${container_name} sh -c \"
                 export http_proxy=''
                 export https_proxy=''
                 cd ${project}
@@ -66,8 +63,7 @@ node('docker') {
                     ${conan_remote} \
                     ${conan_user} \
                     ${conan_pkg_channel}
-            """
-            sh "docker exec ${container_name} sh -c \"${upload_script}\""
+            \""""
         }
     } finally {
         container.stop()
