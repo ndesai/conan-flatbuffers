@@ -41,8 +41,6 @@ class FlatbuffersConan(ConanFile):
 
             cmake.configure(source_dir="..", build_dir=".")
             cmake.build(build_dir=".")
-        # self.run('cmake flatbuffers-1.5.0 %s' % cmake.command_line)
-        # self.run("cmake --build . %s" % cmake.build_config)
 
     def package(self):
         with tools.chdir("flatbuffers-1.5.0"):
