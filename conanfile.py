@@ -43,19 +43,18 @@ class FlatbuffersConan(ConanFile):
             cmake.build(build_dir=".")
 
     def package(self):
-        with tools.chdir("flatbuffers-1.5.0"):
-            self.copy("flatc", dst="bin",
-                      src="flatbuffers-1.5.0/build", keep_path=False)
-            self.copy("flathash", dst="bin",
-                      src="flatbuffers-1.5.0/build", keep_path=False)
-            self.copy("*.h", dst="include/flatbuffers",
-                      src="flatbuffers-1.5.0/include/flatbuffers")
-            self.copy("*.a", dst="lib",
-                      src="flatbuffers-1.5.0/build", keep_path=False)
-            self.copy("*.so", dst="lib",
-                      src="flatbuffers-1.5.0/build", keep_path=False)
-            self.copy("*.dylib", dst="lib",
-                      src="flatbuffers-1.5.0/build", keep_path=False)
+        self.copy("flatc", dst="bin",
+                  src="flatbuffers-1.5.0/build", keep_path=False)
+        self.copy("flathash", dst="bin",
+                  src="flatbuffers-1.5.0/build", keep_path=False)
+        self.copy("*.h", dst="include/flatbuffers",
+                  src="flatbuffers-1.5.0/include/flatbuffers")
+        self.copy("*.a", dst="lib",
+                  src="flatbuffers-1.5.0/build", keep_path=False)
+        self.copy("*.so", dst="lib",
+                  src="flatbuffers-1.5.0/build", keep_path=False)
+        self.copy("*.dylib", dst="lib",
+                  src="flatbuffers-1.5.0/build", keep_path=False)
 
     def package_info(self):
         self.cpp_info.libs = ["flatbuffers"]
