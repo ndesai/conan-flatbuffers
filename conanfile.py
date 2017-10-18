@@ -1,5 +1,6 @@
 import os
 from conans import ConanFile, CMake, tools
+from conans.util import files
 
 
 class FlatbuffersConan(ConanFile):
@@ -9,6 +10,8 @@ class FlatbuffersConan(ConanFile):
     url = "https://github.com/ess-dmsc/conan-flatbuffers"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
+    options = {"shared": [True, False]}
+    default_options = "shared=False"
 
     def source(self):
         tools.download(
@@ -23,15 +26,38 @@ class FlatbuffersConan(ConanFile):
         os.unlink("flatbuffers-1.5.0.tar.gz")
 
     def build(self):
-        cmake = CMake(self)
-        self.run('cmake flatbuffers-1.5.0 %s' % cmake.command_line)
-        self.run("cmake --build . %s" % cmake.build_config)
+        files.mkdir("./flatbuffers-1.5.0/build")
+        with tools.chdir("./flatbuffers-1.5.0/build"):
+            cmake = CMake(self)
+
+            cmake.definitions["FLATBUFFERS_BUILD_TESTS"] = "OFF"
+            cmake.definitions["FLATBUFFERS_INSTALL"] = "OFF"
+            if self.options.shared:
+                cmake.definitions["FLATBUFFERS_BUILD_FLATLIB"] = "OFF"
+                cmake.definitions["FLATBUFFERS_BUILD_SHAREDLIB"] = "ON"
+            else:
+                cmake.definitions["FLATBUFFERS_BUILD_FLATLIB"] = "ON"
+                cmake.definitions["FLATBUFFERS_BUILD_SHAREDLIB"] = "OFF"
+
+            cmake.configure(source_dir="..", build_dir=".")
+            cmake.build(build_dir=".")
+        # self.run('cmake flatbuffers-1.5.0 %s' % cmake.command_line)
+        # self.run("cmake --build . %s" % cmake.build_config)
 
     def package(self):
-        self.copy("flatc", dst="bin", keep_path=False)
-        self.copy("*.h", dst="include/flatbuffers",
-                  src="flatbuffers-1.5.0/include/flatbuffers")
-        self.copy("*.a", dst="lib", keep_path=False)
+        with tools.chdir("flatbuffers-1.5.0"):
+            self.copy("flatc", dst="bin",
+                      src="flatbuffers-1.5.0/build", keep_path=False)
+            self.copy("flathash", dst="bin",
+                      src="flatbuffers-1.5.0/build", keep_path=False)
+            self.copy("*.h", dst="include/flatbuffers",
+                      src="flatbuffers-1.5.0/include/flatbuffers")
+            self.copy("*.a", dst="lib",
+                      src="flatbuffers-1.5.0/build", keep_path=False)
+            self.copy("*.so", dst="lib",
+                      src="flatbuffers-1.5.0/build", keep_path=False)
+            self.copy("*.dylib", dst="lib",
+                      src="flatbuffers-1.5.0/build", keep_path=False)
 
     def package_info(self):
         self.cpp_info.libs = ["flatbuffers"]
