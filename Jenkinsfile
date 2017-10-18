@@ -65,6 +65,10 @@ def get_pipeline(image_key) {
                         --settings FlatBuffers:build_type=Release \
                         --options FlatBuffers:shared=False \
                         --build=missing
+                    conan create ${conan_user}/${conan_pkg_channel} \
+                        --settings FlatBuffers:build_type=Release \
+                        --options FlatBuffers:shared=True \
+                        --build=missing
                 \""""
             }
 
