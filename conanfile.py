@@ -43,6 +43,7 @@ class FlatbuffersConan(ConanFile):
 
             cmake.configure(source_dir="..", build_dir=".")
             cmake.build(build_dir=".")
+            os.rename("../LICENSE.txt", "../LICENSE.FlatBuffers")
 
     def package(self):
         self.copy("flatc", dst="bin",
@@ -57,6 +58,7 @@ class FlatbuffersConan(ConanFile):
                   src="flatbuffers-1.5.0/build", keep_path=False)
         self.copy("*.dylib", dst="lib",
                   src="flatbuffers-1.5.0/build", keep_path=False)
+        self.copy("LICENSE.FlatBuffers", src="flatbuffers-1.5.0")
 
     def package_info(self):
         self.cpp_info.libs = ["flatbuffers"]
