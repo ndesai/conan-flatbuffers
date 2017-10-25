@@ -5,7 +5,7 @@ from conans.util import files
 
 class FlatbuffersConan(ConanFile):
     name = "FlatBuffers"
-    version = "1.5.0"
+    version = "1.5.0-dm1"
     license = "BSD 2-Clause"
     url = "https://github.com/ess-dmsc/conan-flatbuffers"
     settings = "os", "compiler", "build_type", "arch"
@@ -35,6 +35,8 @@ class FlatbuffersConan(ConanFile):
             if self.options.shared:
                 cmake.definitions["FLATBUFFERS_BUILD_FLATLIB"] = "OFF"
                 cmake.definitions["FLATBUFFERS_BUILD_SHAREDLIB"] = "ON"
+                if tools.os_info.is_macos:
+                    cmake.definitions["CMAKE_MACOSX_RPATH"] = "ON"
             else:
                 cmake.definitions["FLATBUFFERS_BUILD_FLATLIB"] = "ON"
                 cmake.definitions["FLATBUFFERS_BUILD_SHAREDLIB"] = "OFF"
