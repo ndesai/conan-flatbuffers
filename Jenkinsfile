@@ -83,9 +83,9 @@ def get_pipeline(image_key) {
         stage("${image_key}: Upload") {
           sh """docker exec ${container_name} ${custom_sh} -c \"
             upload_conan_package.sh ${project}/conanfile.py \
-                ${conan_remote} \
-                ${conan_user} \
-                ${conan_pkg_channel}
+              ${conan_remote} \
+              ${conan_user} \
+              ${conan_pkg_channel}
           \""""
         }
       } finally {
@@ -106,6 +106,6 @@ node {
   }
   parallel builders
 
-  // Delete workspace when build is done
+  // Delete workspace when build is done.
   cleanWs()
 }  // node
