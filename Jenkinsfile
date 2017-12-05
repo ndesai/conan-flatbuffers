@@ -29,9 +29,10 @@ def get_pipeline(image_key) {
         def image = docker.image(images[image_key]['name'])
         def custom_sh = images[image_key]['sh']
         def container = image.run("\
-          --name ${container_name} \
+          --name=${container_name} \
           --tty \
           --network=host \
+          --cpus=2
           --env http_proxy=${env.http_proxy} \
           --env https_proxy=${env.https_proxy} \
           --env local_conan_server=${env.local_conan_server} \
