@@ -32,7 +32,7 @@ def get_pipeline(image_key) {
           --name=${container_name} \
           --tty \
           --network=host \
-          --cpus=2
+          --cpus=2 \
           --env http_proxy=${env.http_proxy} \
           --env https_proxy=${env.https_proxy} \
           --env local_conan_server=${env.local_conan_server} \
