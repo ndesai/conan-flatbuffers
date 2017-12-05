@@ -31,8 +31,9 @@ def get_pipeline(image_key) {
         def container = image.run("\
           --name=${container_name} \
           --tty \
-          --network=host \
           --cpus=2 \
+          --memory=4GB \
+          --network=host \
           --env http_proxy=${env.http_proxy} \
           --env https_proxy=${env.https_proxy} \
           --env local_conan_server=${env.local_conan_server} \
