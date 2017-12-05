@@ -45,12 +45,6 @@ def get_pipeline(image_key) {
           \""""
         }  // stage
 
-        // Copy sources to container and change owner and group.
-        sh "docker cp ${project} ${container_name}:/home/jenkins/${project}"
-        sh """docker exec --user root ${container_name} ${custom_sh} -c \"
-          chown -R jenkins.jenkins /home/jenkins/${project}
-        \""""
-
         stage("${image_key}: Conan setup") {
           withCredentials([
             string(
