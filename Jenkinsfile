@@ -6,15 +6,23 @@ conan_pkg_channel = "stable"
 
 images = [
   'centos': [
-    'name': 'essdmscdm/centos-build-node:0.9.1',
+    'name': 'essdmscdm/centos-build-node:0.9.4',
     'sh': 'sh'
   ],
   'centos-gcc6': [
-    'name': 'essdmscdm/centos-gcc6-build-node:0.3.1',
+    'name': 'essdmscdm/centos-gcc6-build-node:0.3.4',
     'sh': '/usr/bin/scl enable rh-python35 devtoolset-6 -- /bin/bash'
+  ],
+  'debian': [
+  'name': 'essdmscdm/debian-build-node:0.1.1',
+  'sh': 'sh'
   ],
   'fedora': [
     'name': 'essdmscdm/fedora-build-node:0.4.2',
+    'sh': 'sh'
+  ],
+  'ubuntu1710': [
+    'name': 'essdmscdm/ubuntu17.10-build-node:0.0.3',
     'sh': 'sh'
   ]
 ]
@@ -74,7 +82,11 @@ def get_pipeline(image_key) {
             conan create ${conan_user}/${conan_pkg_channel} \
               --settings FlatBuffers:build_type=Release \
               --options FlatBuffers:shared=False \
-              --build=missing && \
+              --build=missing
+            \""""
+
+          sh """docker exec ${container_name} ${custom_sh} -c \"
+            cd ${project} && \
             conan create ${conan_user}/${conan_pkg_channel} \
               --settings FlatBuffers:build_type=Release \
               --options FlatBuffers:shared=True \
