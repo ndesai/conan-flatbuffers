@@ -20,10 +20,6 @@ images = [
   'fedora': [
     'name': 'essdmscdm/fedora-build-node:0.4.2',
     'sh': 'sh'
-  ],
-  'ubuntu1710': [
-    'name': 'essdmscdm/ubuntu17.10-build-node:0.0.3',
-    'sh': 'sh'
   ]
 ]
 
