@@ -15,7 +15,7 @@ class FlatBuffersConan(ConanFile):
     url = "https://github.com/ess-dmsc/conan-flatbuffers"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
-    options = { "shared": [True, False] }
+    options = {"shared": [True, False]}
     default_options = "shared=False"
     
     # The folder name when the *.tar.gz release is extracted
@@ -65,9 +65,9 @@ class FlatBuffersConan(ConanFile):
                   src="%s/include/flatbuffers" % self.folder_name)
         self.copy("*.a", dst="lib",
                   src=self.build_dir, keep_path=False)
-        self.copy("*.so", dst="lib",
+        self.copy("*.so.*", dst="lib",
                   src=self.build_dir, keep_path=False)
-        self.copy("*.dylib", dst="lib",
+        self.copy("*.dylib.*", dst="lib",
                   src=self.build_dir, keep_path=False)
         self.copy("LICENSE.FlatBuffers", src=self.folder_name)
 
